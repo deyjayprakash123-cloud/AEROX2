@@ -47,11 +47,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
 
       if (isImageIntent) {
-        payload.model = "google/gemini-3.1-flash-image-preview";
-        payload.modalities = ["image", "text"];
+        payload.model = "stabilityai/sdxl";
       } else {
-        payload.model = "openai/gpt-5.4-nano";
-        payload.reasoning = { enabled: true };
+        payload.model = "meta-llama/llama-3-8b-instruct";
       }
 
       const response = await fetch(modelUrl, {
