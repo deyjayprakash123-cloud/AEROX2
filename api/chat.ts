@@ -21,9 +21,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY || '';
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    
+    console.log("OpenRouter key loaded:", !!process.env.OPENROUTER_API_KEY);
+
     if (!apiKey) {
-      return res.status(500).json({ error: 'OPENROUTER_API_KEY is not configured' });
+      return res.status(500).json({
+        error: "OpenRouter API is not configured"
+      });
     }
 
     const isImageIntent = /image|picture|draw|generate|paint|art|create a picture/i.test(message);
