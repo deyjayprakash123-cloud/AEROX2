@@ -89,9 +89,9 @@ const dynamicModelRoutingFlow = ai.defineFlow(
 
     if (intentOutput.isImageRequest && intentOutput.imagePrompt) {
       // Step 2a: If it's an image request, use the image generation model
-      modelUsed = 'google/gemini-3.1-flash-image-preview';
+      modelUsed = 'googleai/gemini-1.5-flash-latest';
       const { output } = await ai.generate({
-        model: googleAI.model('gemini-3.1-flash-image-preview'),
+        model: googleAI.model('gemini-1.5-flash-latest'),
         prompt: [{ text: intentOutput.imagePrompt }],
         config: {
           responseModalities: ['image', 'text'], // Request both image and text
@@ -118,9 +118,10 @@ const dynamicModelRoutingFlow = ai.defineFlow(
 
     } else {
       // Step 2b: If it's a text request, use the text-focused model
-      modelUsed = 'openrouter/openai/gpt-5.4-nano'; // Explicitly specify OpenRouter model
+      const textModel = ai.model();
+      modelUsed = textModel.name; 
       const { text } = await ai.generate({
-        model: ai.model('openrouter/openai/gpt-5.4-nano'), // Use ai.model helper
+        model: textModel,
         prompt: `You are AEROX AI, a highly intelligent and deeply reasoning AI. Provide a comprehensive and insightful answer to the user\'s query.\nUser message: ${input.userMessage}`,
         config: {
             // No direct 'reasoning: { enabled: true }' config, rely on prompt for deep reasoning

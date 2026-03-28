@@ -8,6 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
 const MultiPersonalityChatInputSchema = z.object({
@@ -80,8 +81,8 @@ const multiPersonalityChatFlow = ai.defineFlow(
     if (isImageRequest) {
       // Use the specified image generation model
       const imagePrompt = image ? [{ media: { url: image } }, { text: message }] : message;
-      const { media } = await ai.generate({
-        model: 'google/gemini-3.1-flash-image-preview', // As per user request, assuming OpenRouter config
+      const { text, media } = await ai.generate({
+        model: googleAI.model('gemini-1.5-flash-latest'),
         prompt: imagePrompt,
         config: {
           responseModalities: ['image', 'text'],
@@ -91,10 +92,9 @@ const multiPersonalityChatFlow = ai.defineFlow(
       if (media?.url) {
         generatedImageUrl = media.url;
       }
-      // If an image is generated, the text response might be secondary or explanatory.
-      // For simplicity, we'll return the image and a generic confirmation.
+      
       return {
-        combinedResponse: 'Image generated successfully!',
+        combinedResponse: text ?? 'Image generated successfully!',
         imageUrl: generatedImageUrl,
       };
     } else {
@@ -111,12 +111,12 @@ const multiPersonalityChatFlow = ai.defineFlow(
             promptParts.unshift({ media: { url: image } });
           }
 
-          // Use the specified text generation model with reasoning config
+          // Use the default text generation model
           const { text } = await ai.generate({
-            model: 'openai/gpt-5.4-nano', // As per user request, assuming OpenRouter config
+            model: ai.model(),
             prompt: promptParts,
             config: {
-              temperature: 0.7, // Proxy for 'reasoning: { enabled: true }'
+              temperature: 0.7,
             },
           });
           return { personality: personality.name, text: text! };
