@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "An abstract representation of a neural network or brain pathways.",
+      "imageUrl": "https://picsum.photos/seed/brain-network/400/300",
+      "imageHint": "brain network"
+    },
+    {
+      "id": "2",
+      "description": "A colorful and abstract piece of digital art.",
+      "imageUrl": "https://picsum.photos/seed/abstract-art/400/300",
+      "imageHint": "abstract art"
+    },
+    {
+      "id": "3",
+      "description": "A close-up of digital documents or code on a screen.",
+      "imageUrl": "https://picsum.photos/seed/docs-code/400/300",
+      "imageHint": "documents code"
+    },
+    {
+      "id": "4",
+      "description": "A vibrant image of a galaxy or nebula in deep space.",
+      "imageUrl": "https://picsum.photos/seed/galaxy-nebula/400/300",
+      "imageHint": "galaxy nebula"
+    },
+    {
+      "id": "5",
+      "description": "An abstract visualization of light streaks moving at high speed.",
+      "imageUrl": "https://picsum.photos/seed/light-speed/400/300",
+      "imageHint": "light speed"
+    }
+  ]
 }
