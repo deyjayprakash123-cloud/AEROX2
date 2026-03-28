@@ -7,4 +7,6 @@ free to contribute #opensouce
 <img width="1901" height="892" alt="Screenshot 2026-03-29 020908" src="https://github.com/user-attachments/assets/612db8c2-5e53-40dc-b4ea-554b77fd81cf" />
 # feedback<br>
 contact deyjayprakash123@gmail.com
+# update
+image feature is comming soon
 
