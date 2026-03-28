@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AEROX AI - Dueling Personalities</title>
+    <!-- Modern Font: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-CoPe1LIG.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-_pqtqIpz.css">
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="neural-spinner">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Background Three.js Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Content Container -->
+    <div id="app" class="app-content">
+      
+      <!-- Navbar / Header -->
+      <nav class="navbar">
+        <div class="logo">AEROX.<span>AI</span></div>
+      </nav>
+
+      <!-- Hero Section -->
+      <section class="hero glass-panel">
+        <h1 class="glow-text">AEROX AI</h1>
+        <p class="subtitle">Multiple Personalities. Deeper Reasoning.</p>
+      </section>
+
+      <!-- Information Section -->
+      <section class="features">
+        <h2>What AEROX AI Can Do</h2>
+        <div class="features-grid">
+          <div class="card tilt-card fade-in-scroll">
+            <h3>Multi-Personality Reasoning</h3>
+            <p>AI answers using multiple personalities for deeper reasoning.</p>
+          </div>
+          <div class="card tilt-card fade-in-scroll">
+            <h3>Generates Images</h3>
+            <p>Automatically creates images when requested.</p>
+          </div>
+          <div class="card tilt-card fade-in-scroll">
+            <h3>Reads Files</h3>
+            <p>Upload files and AI understands them.</p>
+          </div>
+          <div class="card tilt-card fade-in-scroll">
+            <h3>Deep Reasoning</h3>
+            <p>Advanced thinking across personalities.</p>
+          </div>
+          <div class="card tilt-card fade-in-scroll">
+            <h3>Fast Responses</h3>
+            <p>Parallel processing for quick answers.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Floating Start Chat Button -->
+      <div class="start-chat-container">
+        <button id="start-chat-btn" class="glow-btn">
+          <span class="btn-text">🚀 Start Chat</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>Created by Jayprakash</p>
+        <p>Email: <a href="mailto:deyjayprakash123@gmail.com">deyjayprakash123@gmail.com</a></p>
+      </footer>
+    </div>
+
+    <!-- Chat Slide Panel -->
+    <div id="chat-panel" class="chat-panel glass-panel">
+      
+      <div class="chat-header">
+        <h2>Neural Link</h2>
+        <button id="close-chat-btn">&times;</button>
+      </div>
+
+      <div class="chat-history" id="chat-history">
+        <div class="chat-bubble ai">Welcome to AEROX AI. How can we help you today?</div>
+      </div>
+
+      <div class="chat-controls-wrapper">
+        <div class="chat-settings">
+          <label for="persona-slider">Target Personalities: <span id="persona-val">1</span></label>
+          <input type="range" id="persona-slider" min="1" max="5" value="1" step="1" />
+        </div>
+
+        <div class="chat-input-area">
+          <label for="file-upload" class="upload-btn" title="Upload Text File">
+            📄
+          </label>
+          <input type="file" id="file-upload" accept=".txt,.json,.md,.csv" style="display: none;" />
+          
+          <input type="text" id="chat-input" placeholder="Initiate neural transfer..." autocomplete="off"/>
+          <button id="send-btn" class="glow-btn send-btn">Send</button>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>
