@@ -67,8 +67,8 @@ class OvalScene {
 
   private createOval() {
     const curve = new THREE.EllipseCurve(0, 0, 5, 3, 0, 2 * Math.PI, false, 0);
-    const points = curve.getPoints(200);
-    const path = new THREE.CatmullRomCurve3(points);
+    const points = curve.getPoints(200).map(p => new THREE.Vector3(p.x, p.y, 0));
+    const path = new THREE.CatmullRomCurve3(points, true);
 
     const geometry = new THREE.TubeGeometry(path, 200, 0.03, 8, true);
     const material = new THREE.MeshBasicMaterial({ 
