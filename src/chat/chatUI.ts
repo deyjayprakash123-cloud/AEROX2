@@ -85,6 +85,23 @@ export function initUIElements() {
       if (e.key === 'Enter') handleDispatch();
     });
   }
+
+  const generateImageBtn = document.getElementById('generate-image-btn') as HTMLButtonElement;
+  const imageInput = document.getElementById('image-input') as HTMLInputElement;
+
+  if (generateImageBtn && imageInput) {
+    const handleImageGeneration = () => {
+      const prompt = imageInput.value.trim();
+      if (!prompt) return;
+      imageInput.value = '';
+      handleImageRequest(prompt);
+    };
+
+    generateImageBtn.addEventListener('click', handleImageGeneration);
+    imageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleImageGeneration();
+    });
+  }
 }
 
 export function appendBubble(content: string | HTMLElement, type: 'user'|'ai'): HTMLDivElement {
@@ -136,6 +153,61 @@ async function handleUserInput(payloadMessage: string, displayMessage: string, s
       chatHistory.removeChild(indicator);
     }
     appendBubble(`Connection interrupted. Neural pathways offline.`, 'ai');
+  } finally {
+    setThinkingState(false);
+  }
+}
+
+async function handleImageRequest(prompt: string) {
+  const chatHistory = document.getElementById('chat-history') as HTMLDivElement;
+  appendBubble(`🖼️ Image Prompt: ${prompt}`, 'user');
+  
+  setThinkingState(true);
+  
+  const typingBubble = document.createElement('div');
+  typingBubble.className = `typing`;
+  typingBubble.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+  const indicator = appendBubble(typingBubble, 'ai');
+
+  try {
+    const response = await fetch('/api/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await response.json();
+
+    chatHistory.removeChild(indicator);
+    
+    if (data.error) {
+       appendBubble(`Image Generation Error: ${data.error}`, 'ai');
+    } else if (data.images && data.images.length > 0) {
+       data.images.forEach((imgUrl: string) => {
+         const wrapper = document.createElement('div');
+         wrapper.style.display = 'flex';
+         wrapper.style.flexDirection = 'column';
+         
+         const imgElement = document.createElement('img');
+         if (imgUrl.trim().startsWith('!')) {
+            wrapper.innerHTML = imgUrl.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" style="max-width: 100%; border-radius: 8px;" />');
+         } else {
+            imgElement.src = imgUrl;
+            imgElement.alt = "Generated Image";
+            imgElement.style.maxWidth = "100%";
+            imgElement.style.borderRadius = "8px";
+            wrapper.appendChild(imgElement);
+         }
+         
+         appendBubble(wrapper, 'ai');
+       });
+    } else {
+       appendBubble(`No image returned.`, 'ai');
+    }
+  } catch (err: any) {
+    if (chatHistory && indicator.parentElement === chatHistory) {
+      chatHistory.removeChild(indicator);
+    }
+    appendBubble(`Image generator connection failed.`, 'ai');
   } finally {
     setThinkingState(false);
   }
