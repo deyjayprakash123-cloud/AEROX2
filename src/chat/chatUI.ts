@@ -1,5 +1,5 @@
 import { setThinkingState } from '../animations/neural';
-import { sendCognitiveRequest } from './personality';
+import { askAerox } from './personality';
 
 export function initUIElements() {
   const preloader = document.getElementById('preloader');
@@ -136,16 +136,15 @@ async function handleUserInput(payloadMessage: string, displayMessage: string, s
   const indicator = appendBubble(typingBubble, 'ai');
 
   try {
-    const numPersonalities = parseInt(slider.value, 10);
-    const data = await sendCognitiveRequest(payloadMessage, numPersonalities);
+    const answer = await askAerox(payloadMessage);
 
     chatHistory.removeChild(indicator);
     
-    if (data.error) {
-       appendBubble(`Error: ${data.error}`, 'ai');
+    if (answer.includes("AEROX_CONFIG_ERROR") || answer.includes("Aerox API Error:")) {
+       appendBubble(`Error: ${answer}`, 'ai');
     } else {
        // Convert markdown images to HTML img tags for Image Generation intent
-       let cleanedAnswer = data.answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" />');
+       let cleanedAnswer = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" />');
        appendBubble(cleanedAnswer, 'ai');
     }
   } catch (err: any) {
@@ -170,38 +169,27 @@ async function handleImageRequest(prompt: string) {
   const indicator = appendBubble(typingBubble, 'ai');
 
   try {
-    const response = await fetch('/api/image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })
-    });
-    const data = await response.json();
+    // Force an image generation intent by prepending a keyword if needed
+    const imagePayload = /generate|image|draw|picture|create/i.test(prompt) ? prompt : `generate image of ${prompt}`;
+    const answer = await askAerox(imagePayload);
 
     chatHistory.removeChild(indicator);
     
-    if (data.error) {
-       appendBubble(`Image Generation Error: ${data.error}`, 'ai');
-    } else if (data.images && data.images.length > 0) {
-       data.images.forEach((imgUrl: string) => {
-         const wrapper = document.createElement('div');
-         wrapper.style.display = 'flex';
-         wrapper.style.flexDirection = 'column';
-         
-         const imgElement = document.createElement('img');
-         if (imgUrl.trim().startsWith('!')) {
-            wrapper.innerHTML = imgUrl.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" style="max-width: 100%; border-radius: 8px;" />');
-         } else {
-            imgElement.src = imgUrl;
-            imgElement.alt = "Generated Image";
-            imgElement.style.maxWidth = "100%";
-            imgElement.style.borderRadius = "8px";
-            wrapper.appendChild(imgElement);
-         }
-         
-         appendBubble(wrapper, 'ai');
-       });
+    if (answer.includes("AEROX_CONFIG_ERROR") || answer.includes("Aerox API Error:")) {
+       appendBubble(`Image Generation Error: ${answer}`, 'ai');
     } else {
-       appendBubble(`No image returned.`, 'ai');
+       const wrapper = document.createElement('div');
+       wrapper.style.display = 'flex';
+       wrapper.style.flexDirection = 'column';
+       
+       // Process markdown images if present
+       if (answer.includes('![')) {
+         wrapper.innerHTML = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" style="max-width: 100%; border-radius: 8px;" />');
+       } else {
+         wrapper.innerHTML = `<p>${answer}</p>`;
+       }
+       
+       appendBubble(wrapper, 'ai');
     }
   } catch (err: any) {
     if (chatHistory && indicator.parentElement === chatHistory) {
