@@ -12,9 +12,9 @@
     "three": "^0.160.0"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "vite": "^5.0.8",
     "@types/three": "^0.160.0",
-    "@vercel/node": "^3.0.15"
+    "@vercel/node": "^5.7.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
   }
 }

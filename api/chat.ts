@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
 
       if (isImageIntent) {
-        payload.model = "stabilityai/sdxl";
+        payload.model = "sourceful/riverflow-v2-fast";
       } else {
         payload.model = "meta-llama/llama-3-8b-instruct";
       }
