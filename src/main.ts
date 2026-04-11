@@ -2,6 +2,8 @@ import './style.css';
 import { initNeuralNetwork } from './animations/neural';
 import { initUIElements } from './chat/chatUI';
 
+console.log("Neural Link Status:", !!import.meta.env.VITE_OPENROUTER_API_KEY);
+
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize the 60fps 3D Engine Neural Network 
   initNeuralNetwork();
