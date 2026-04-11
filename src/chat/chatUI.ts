@@ -140,13 +140,10 @@ async function handleUserInput(payloadMessage: string, displayMessage: string, s
 
     chatHistory.removeChild(indicator);
     
-    if (answer.includes("AEROX_CONFIG_ERROR") || answer.includes("Aerox API Error:")) {
-       appendBubble(`Error: ${answer}`, 'ai');
-    } else {
-       // Convert markdown images to HTML img tags for Image Generation intent
-       let cleanedAnswer = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" />');
-       appendBubble(cleanedAnswer, 'ai');
-    }
+    // Convert markdown images to HTML img tags for Image Generation intent
+    // If it's an error string from askAerox, it'll just render it as normal text.
+    let cleanedAnswer = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" />');
+    appendBubble(cleanedAnswer, 'ai');
   } catch (err: any) {
     if (chatHistory && indicator.parentElement === chatHistory) {
       chatHistory.removeChild(indicator);
@@ -175,22 +172,18 @@ async function handleImageRequest(prompt: string) {
 
     chatHistory.removeChild(indicator);
     
-    if (answer.includes("AEROX_CONFIG_ERROR") || answer.includes("Aerox API Error:")) {
-       appendBubble(`Image Generation Error: ${answer}`, 'ai');
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    
+    // Process markdown images if present, otherwise render the (error) message
+    if (answer.includes('![')) {
+      wrapper.innerHTML = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" style="max-width: 100%; border-radius: 8px;" />');
     } else {
-       const wrapper = document.createElement('div');
-       wrapper.style.display = 'flex';
-       wrapper.style.flexDirection = 'column';
-       
-       // Process markdown images if present
-       if (answer.includes('![')) {
-         wrapper.innerHTML = answer.replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" alt="AI Generated Image" style="max-width: 100%; border-radius: 8px;" />');
-       } else {
-         wrapper.innerHTML = `<p>${answer}</p>`;
-       }
-       
-       appendBubble(wrapper, 'ai');
+      wrapper.innerHTML = `<p>${answer}</p>`;
     }
+    
+    appendBubble(wrapper, 'ai');
   } catch (err: any) {
     if (chatHistory && indicator.parentElement === chatHistory) {
       chatHistory.removeChild(indicator);
