@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'X-Title': 'AEROX AI'
       },
       body: JSON.stringify({
-        model: 'sourceful/riverflow-v2-fast',
+        model: 'black-forest-labs/flux-1-schnell',
         messages: [
           {
             "role": "user",

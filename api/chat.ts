@@ -21,9 +21,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     
-    console.log("OpenRouter key loaded:", !!process.env.OPENROUTER_API_KEY);
+    console.log("OpenRouter key loaded:", !!import.meta.env.VITE_OPENROUTER_API_KEY);
 
     if (!apiKey) {
       return res.status(500).json({
@@ -47,9 +47,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
 
       if (isImageIntent) {
-        payload.model = "sourceful/riverflow-v2-fast";
+        payload.model = "black-forest-labs/flux-1-schnell";
       } else {
-        payload.model = "meta-llama/llama-3-8b-instruct";
+        payload.model = "deepseek/deepseek-r1";
       }
 
       const response = await fetch(modelUrl, {
