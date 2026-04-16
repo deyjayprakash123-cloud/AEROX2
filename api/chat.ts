@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
+    const apiKey = "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";
     
     console.log("OpenRouter key loaded:", !!apiKey);
 
@@ -47,8 +47,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
 
       if (isImageIntent) {
-        payload.model = "black-forest-labs/flux.2-klein-4b";
-        payload.modalities = ["image"];
+        payload.model = "openai/gpt-5-image";
+        payload.modalities = ["image", "text"];
       } else {
         payload.model = "openrouter/elephant-alpha";
       }

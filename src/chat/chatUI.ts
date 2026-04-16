@@ -40,8 +40,14 @@ export function initUIElements() {
   const personaVal = document.getElementById('persona-val') as HTMLSpanElement;
 
   if (slider && personaVal) {
+    const personaNames = ['Logical Analyst', 'Creative Thinker', 'Critic', 'Optimist', 'Scientist'];
+    // Initialize the label correctly on load
+    const initVal = parseInt(slider.value, 10);
+    personaVal.textContent = `${initVal} - ${personaNames[initVal - 1]}`;
+
     slider.addEventListener('input', (e: Event) => {
-      personaVal.textContent = (e.target as HTMLInputElement).value;
+      const val = parseInt((e.target as HTMLInputElement).value, 10);
+      personaVal.textContent = `${val} - ${personaNames[val - 1]}`;
     });
   }
 
@@ -136,7 +142,8 @@ async function handleUserInput(payloadMessage: string, displayMessage: string, s
   const indicator = appendBubble(typingBubble, 'ai');
 
   try {
-    const answer = await askAerox(payloadMessage);
+    const numPersonalities = parseInt(slider.value, 10) || 1;
+    const answer = await askAerox(payloadMessage, numPersonalities);
 
     chatHistory.removeChild(indicator);
     

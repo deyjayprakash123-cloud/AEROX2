@@ -23,9 +23,17 @@ let conversationHistory: any[] = [];
  * AEROX AI Service
  * Handles routing between Grok (Text) and Flux (Image)
  */
-export const askAerox = async (userInput: string): Promise<string> => {
+const PERSONALITIES = [
+  { name: 'Logical Analyst', prompt: 'You are a Logical Analyst. Analyze the input logically and objectively.' },
+  { name: 'Creative Thinker', prompt: 'You are a Creative Thinker. Approach the topic with imagination and innovative ideas.' },
+  { name: 'Critic', prompt: 'You are a Critic. Provide a critical review, finding potential flaws and counterarguments.' },
+  { name: 'Optimist', prompt: 'You are an Optimist. Highlight the positive aspects, opportunities, and benefits.' },
+  { name: 'Scientist', prompt: 'You are a Scientist. Examine the prompt with empirical evidence, scientific principles, and hypotheses.' }
+];
+
+export const askAerox = async (userInput: string, numPersonalities: number = 1): Promise<string> => {
   // Support both Vite (local) and Vercel/Node (production) env variables
-  const API_KEY = import.meta.env?.VITE_OPENROUTER_API_KEY || process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
+  const API_KEY = "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";
 
   if (!API_KEY) return "Neural link error: API Key missing in environment variables.";
 
@@ -33,7 +41,7 @@ export const askAerox = async (userInput: string): Promise<string> => {
   
   try {
     if (isImage) {
-      // ---------------- IMAGE INTENT (Flux) ----------------
+      // ---------------- IMAGE INTENT (GPT-5 Image) ----------------
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -43,9 +51,9 @@ export const askAerox = async (userInput: string): Promise<string> => {
           "X-OpenRouter-Title": "AEROX AI"
         },
         body: JSON.stringify({
-          model: "black-forest-labs/flux.2-klein-4b",
+          model: "openai/gpt-5-image",
           messages: [{ role: "user", content: userInput }],
-          modalities: ["image"]
+          modalities: ["image", "text"]
         }),
       });
 
@@ -64,11 +72,19 @@ export const askAerox = async (userInput: string): Promise<string> => {
       return data.choices?.[0]?.message?.content || "No image response.";
     } else {
       // ---------------- TEXT INTENT (Elephant Alpha) ----------------
+      const count = Math.max(1, Math.min(numPersonalities, 5));
+      const selectedPersona = PERSONALITIES[count - 1];
+
       // Add the user message to the history
       conversationHistory.push({
         role: 'user',
         content: userInput
       });
+
+      const personaMessages = [
+        { role: 'system', content: selectedPersona.prompt },
+        ...conversationHistory
+      ];
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -79,28 +95,28 @@ export const askAerox = async (userInput: string): Promise<string> => {
           "X-OpenRouter-Title": "AEROX AI"
         },
         body: JSON.stringify({
-          "model": "openrouter/elephant-alpha",
-          "messages": conversationHistory
+          "model": "google/gemma-4-26b-a4b-it:free",
+          "messages": personaMessages,
+          "reasoning": {"enabled": true}
         })
       });
 
       const data = await response.json();
-      if (data.error) {
-        console.error("OpenRouter Text Error:", data.error);
-        return `Neural pathways offline: ${data.error.message}`;
-      }
+      if (data.error) throw new Error(data.error.message);
 
       const assistantMessage = data.choices?.[0]?.message;
+      const replyContent = assistantMessage?.content || "No response.";
+      
+      const finalAnswer = `**[${selectedPersona.name}]**:\n${replyContent}`;
 
-      if (!assistantMessage) return "No response.";
-
-      // Preserve the assistant message exactly as it came back to keep reasoning details
+      // Preserve the combined assistant message along with reasoning_details for future context chaining
       conversationHistory.push({
         role: 'assistant',
-        content: assistantMessage.content
+        content: finalAnswer,
+        reasoning_details: assistantMessage?.reasoning_details
       });
 
-      return assistantMessage.content || "No text response.";
+      return finalAnswer;
     }
   } catch (err) {
     console.error("Network/Connection Error:", err);
