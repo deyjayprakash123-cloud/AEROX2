@@ -21,9 +21,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
     
-    console.log("OpenRouter key loaded:", !!import.meta.env.VITE_OPENROUTER_API_KEY);
+    console.log("OpenRouter key loaded:", !!apiKey);
 
     if (!apiKey) {
       return res.status(500).json({
@@ -47,9 +47,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
 
       if (isImageIntent) {
-        payload.model = "black-forest-labs/flux-1-schnell";
+        payload.model = "black-forest-labs/flux.2-klein-4b";
+        payload.modalities = ["image"];
       } else {
-        payload.model = "deepseek/deepseek-r1";
+        payload.model = "openrouter/elephant-alpha";
       }
 
       const response = await fetch(modelUrl, {
@@ -58,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://aerox-ai.vercel.app',
-          'X-Title': 'AEROX AI'
+          'X-OpenRouter-Title': 'AEROX AI'
         },
         body: JSON.stringify(payload)
       });
@@ -70,9 +71,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       const data = await response.json();
+      
+      let replyContent = data.choices?.[0]?.message?.content || "";
+      
+      if (data.choices?.[0]?.message?.images) {
+        const images = data.choices[0].message.images;
+        const imageTags = images.map((img: any) => `![Generated Image](${img.image_url.url})`).join('\n');
+        replyContent = (replyContent ? replyContent + "\n\n" : "") + imageTags;
+      }
+      
+      if (!replyContent) replyContent = "No response.";
+
       return {
         personality: persona.name,
-        reply: data.choices?.[0]?.message?.content || "No response."
+        reply: replyContent
       };
     });
 
